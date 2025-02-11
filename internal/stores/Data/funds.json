@@ -1,0 +1,15 @@
+[
+    {
+        "id": "1",
+        "name": "Fund 1",
+        "totalShares": 1000,
+        "ownedShares": 1000,
+        "owners": [
+            {
+                "id": "1",
+                "name": "John Doe",
+                "totalShares": 1000
+            }
+        ]
+    }
+]

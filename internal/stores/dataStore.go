@@ -2,55 +2,39 @@ package stores
 
 import (
 	"context"
+	"encoding/json"
+	"os"
+	"path/filepath"
 
 	"github.com/AugmentFund/internal/data"
 )
 
+const (
+	usersFilePath = "internal/stores/Data/users.json"
+	fundsFilePath = "internal/stores/Data/funds.json"
+)
+
 // TODO load from db
-type DataStore struct {
-	Users []data.User
-	Funds []data.Fund
-}
+type DataStore struct{}
 
 func NewDataStore() *DataStore {
-	return &DataStore{
-		Users: []data.User{
-			{
-				ID:   "1",
-				Name: "John Doe",
-			},
-			{
-				ID:   "2",
-				Name: "Jane Doe",
-			},
-		},
-		Funds: []data.Fund{
-			{
-				ID:          "1",
-				Name:        "Fund 1",
-				TotalShares: 1000,
-				OwnedShares: 1000,
-				Owners: []data.Owner{
-					{
-						ID:          "1",
-						Name:        "John Doe",
-						TotalShares: 1000,
-					},
-				},
-			},
-		},
-	}
+	return &DataStore{}
 }
 
 func (s *DataStore) GetUsers(ctx context.Context) ([]data.User, error) {
-	if s.Users == nil {
-		s.Users = []data.User{}
+	users, err := s.loadUsersFromFile()
+	if err != nil {
+		return []data.User{}, err
 	}
-	return s.Users, nil
+	return users, nil
 }
 
 func (s *DataStore) GetUser(ctx context.Context, id string) (*data.User, error) {
-	for _, user := range s.Users {
+	users, err := s.loadUsersFromFile()
+	if err != nil {
+		return &data.User{}, err
+	}
+	for _, user := range users {
 		if user.ID == id {
 			return &user, nil
 		}
@@ -59,24 +43,55 @@ func (s *DataStore) GetUser(ctx context.Context, id string) (*data.User, error) 
 }
 
 func (s *DataStore) CreateUser(ctx context.Context, user data.User) ([]data.User, error) {
-	for _, u := range s.Users {
+	users, err := s.loadUsersFromFile()
+	if err != nil {
+		return []data.User{}, err
+	}
+	for _, u := range users {
 		if u.ID == user.ID {
-			return s.Users, nil
+			return users, nil
 		}
 	}
-	s.Users = append(s.Users, user)
-	return s.Users, nil
+	users = append(users, user)
+	return users, nil
+}
+
+func (s *DataStore) loadUsersFromFile() ([]data.User, error) {
+	currDir, err := os.Getwd()
+	if err != nil {
+		return []data.User{}, err
+	}
+
+	path := filepath.Join(currDir, usersFilePath)
+
+	usersData, err := os.ReadFile(path)
+	if err != nil {
+		return []data.User{}, err
+	}
+
+	var users []data.User
+	err = json.Unmarshal(usersData, &users)
+	if err != nil {
+		return []data.User{}, err
+	}
+
+	return users, nil
 }
 
 func (s *DataStore) GetFunds(ctx context.Context) ([]data.Fund, error) {
-	if s.Funds == nil {
-		s.Funds = []data.Fund{}
+	funds, err := s.loadFundsFromFile()
+	if err != nil {
+		return []data.Fund{}, err
 	}
-	return s.Funds, nil
+	return funds, nil
 }
 
 func (s *DataStore) GetFund(ctx context.Context, id string) (*data.Fund, error) {
-	for _, fund := range s.Funds {
+	funds, err := s.loadFundsFromFile()
+	if err != nil {
+		return &data.Fund{}, err
+	}
+	for _, fund := range funds {
 		if fund.ID == id {
 			return &fund, nil
 		}
@@ -85,11 +100,37 @@ func (s *DataStore) GetFund(ctx context.Context, id string) (*data.Fund, error) 
 }
 
 func (s *DataStore) CreateFund(ctx context.Context, fund data.Fund) ([]data.Fund, error) {
-	for _, f := range s.Funds {
+	funds, err := s.loadFundsFromFile()
+	if err != nil {
+		return []data.Fund{}, err
+	}
+	for _, f := range funds {
 		if f.ID == fund.ID {
-			return s.Funds, nil
+			return funds, nil
 		}
 	}
-	s.Funds = append(s.Funds, fund)
-	return s.Funds, nil
+	funds = append(funds, fund)
+	return funds, nil
+}
+
+func (s *DataStore) loadFundsFromFile() ([]data.Fund, error) {
+	currDir, err := os.Getwd()
+	if err != nil {
+		return []data.Fund{}, err
+	}
+
+	path := filepath.Join(currDir, fundsFilePath)
+
+	fundsData, err := os.ReadFile(path)
+	if err != nil {
+		return []data.Fund{}, err
+	}
+
+	var funds []data.Fund
+	err = json.Unmarshal(fundsData, &funds)
+	if err != nil {
+		return []data.Fund{}, err
+	}
+
+	return funds, nil
 }
