@@ -1,14 +1,17 @@
 [
   {
     "id": "1",
-    "name": "John Doe"
+    "name": "John Doe",
+    "OwnedFunds": null
   },
   {
     "id": "2",
-    "name": "Jane Doe"
+    "name": "Jane Doe",
+    "OwnedFunds": null
   },
   {
-    "id": "4",
-    "name": "Ryan Struthers"
+    "id": "3",
+    "name": "Ryan Struthers",
+    "OwnedFunds": null
   }
 ]

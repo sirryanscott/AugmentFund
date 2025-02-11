@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/AugmentFund/internal/data"
 )
@@ -51,11 +52,8 @@ func (s *DataStore) CreateUser(ctx context.Context, user data.User) ([]data.User
 		return []data.User{}, err
 	}
 
-	for _, u := range users {
-		if u.ID == user.ID {
-			return users, nil
-		}
-	}
+	id := strconv.Itoa(len(users) + 1)
+	user.ID = id
 
 	users = append(users, user)
 
@@ -97,11 +95,8 @@ func (s *DataStore) CreateFund(ctx context.Context, fund data.Fund) ([]data.Fund
 		return []data.Fund{}, err
 	}
 
-	for _, f := range funds {
-		if f.ID == fund.ID {
-			return funds, nil
-		}
-	}
+	id := strconv.Itoa(len(funds) + 1)
+	fund.ID = id
 
 	funds = append(funds, fund)
 

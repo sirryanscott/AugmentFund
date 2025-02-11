@@ -11,12 +11,5 @@
         "TotalShares": 1000
       }
     ]
-  },
-  {
-    "id": "2",
-    "name": "The new Fund",
-    "totalShares": 1000,
-    "ownedShares": 0,
-    "owners": null
   }
 ]
