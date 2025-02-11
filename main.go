@@ -47,6 +47,7 @@ func main() {
 
 	// Fund routes
 	r.Post("/fund", fundHandler.CreateFund)
+	r.Post("/transfer", fundHandler.CreateTransfer)
 
 	log.Println("Server is running on port 8080")
 	if err := http.ListenAndServe(":8080", r); err != nil {

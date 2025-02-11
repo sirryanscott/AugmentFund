@@ -15,7 +15,6 @@ const (
 	fundsFilePath = "internal/stores/Data/funds.json"
 )
 
-// TODO load from db
 type DataStore struct{}
 
 func NewDataStore() *DataStore {
@@ -31,19 +30,19 @@ func (s *DataStore) GetUsers(ctx context.Context) ([]data.User, error) {
 	return users, nil
 }
 
-func (s *DataStore) GetUser(ctx context.Context, id string) (*data.User, error) {
+func (s *DataStore) GetUser(ctx context.Context, id string) (data.User, error) {
 	users, err := loadDataFromFile[[]data.User](usersFilePath, []data.User{})
 	if err != nil {
-		return &data.User{}, err
+		return data.User{}, err
 	}
 
 	for _, user := range users {
 		if user.ID == id {
-			return &user, nil
+			return user, nil
 		}
 	}
 
-	return &data.User{}, nil
+	return data.User{}, nil
 }
 
 func (s *DataStore) CreateUser(ctx context.Context, user data.User) ([]data.User, error) {
@@ -74,19 +73,19 @@ func (s *DataStore) GetCapTables(ctx context.Context) ([]data.Fund, error) {
 	return funds, nil
 }
 
-func (s *DataStore) GetCapTableByID(ctx context.Context, id string) (*data.Fund, error) {
+func (s *DataStore) GetCapTableByID(ctx context.Context, id string) (data.Fund, error) {
 	funds, err := loadDataFromFile[[]data.Fund](fundsFilePath, []data.Fund{})
 	if err != nil {
-		return &data.Fund{}, err
+		return data.Fund{}, err
 	}
 
 	for _, fund := range funds {
 		if fund.ID == id {
-			return &fund, nil
+			return fund, nil
 		}
 	}
 
-	return &data.Fund{}, nil
+	return data.Fund{}, nil
 }
 
 func (s *DataStore) CreateFund(ctx context.Context, fund data.Fund) ([]data.Fund, error) {
@@ -99,6 +98,27 @@ func (s *DataStore) CreateFund(ctx context.Context, fund data.Fund) ([]data.Fund
 	fund.ID = id
 
 	funds = append(funds, fund)
+
+	err = s.saveDataToFile(fundsFilePath, funds)
+	if err != nil {
+		return []data.Fund{}, err
+	}
+
+	return funds, nil
+}
+
+func (s *DataStore) UpdateFund(ctx context.Context, fund data.Fund) ([]data.Fund, error) {
+	funds, err := loadDataFromFile[[]data.Fund](fundsFilePath, []data.Fund{})
+	if err != nil {
+		return []data.Fund{}, err
+	}
+
+	for i, fundFromDB := range funds {
+		if fundFromDB.ID == fund.ID {
+			funds[i] = fund
+			break
+		}
+	}
 
 	err = s.saveDataToFile(fundsFilePath, funds)
 	if err != nil {
