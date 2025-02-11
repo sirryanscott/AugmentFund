@@ -78,7 +78,7 @@ func (s *DataStore) loadUsersFromFile() ([]data.User, error) {
 	return users, nil
 }
 
-func (s *DataStore) GetFunds(ctx context.Context) ([]data.Fund, error) {
+func (s *DataStore) GetCapTables(ctx context.Context) ([]data.Fund, error) {
 	funds, err := s.loadFundsFromFile()
 	if err != nil {
 		return []data.Fund{}, err
@@ -86,7 +86,7 @@ func (s *DataStore) GetFunds(ctx context.Context) ([]data.Fund, error) {
 	return funds, nil
 }
 
-func (s *DataStore) GetFund(ctx context.Context, id string) (*data.Fund, error) {
+func (s *DataStore) GetCapTableByID(ctx context.Context, id string) (*data.Fund, error) {
 	funds, err := s.loadFundsFromFile()
 	if err != nil {
 		return &data.Fund{}, err

@@ -41,10 +41,12 @@ func main() {
 	r.Get("/users/{id}", userHandler.GetUser)
 	r.Post("/users", userHandler.CreateUser)
 
+	// Cap table routes
+	r.Get("/cap-tables", fundHandler.GetCapTables)
+	r.Get("/cap-table/{id}", fundHandler.GetCapTableByID)
+
 	// Fund routes
-	r.Get("/funds", fundHandler.GetFunds)
-	r.Get("/funds/{id}", fundHandler.GetFund)
-	r.Post("/funds", fundHandler.CreateFund)
+	r.Post("/fund", fundHandler.CreateFund)
 
 	log.Println("Server is running on port 8080")
 	if err := http.ListenAndServe(":8080", r); err != nil {

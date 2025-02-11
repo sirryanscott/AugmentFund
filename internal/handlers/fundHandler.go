@@ -17,9 +17,9 @@ func NewFundHandler(fundService *services.FundService) *FundHandler {
 	return &FundHandler{FundService: fundService}
 }
 
-func (h *FundHandler) GetFunds(w http.ResponseWriter, r *http.Request) {
+func (h *FundHandler) GetCapTables(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	funds, err := h.FundService.GetFunds(ctx)
+	funds, err := h.FundService.GetCapTables(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -27,10 +27,10 @@ func (h *FundHandler) GetFunds(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(funds)
 }
 
-func (h *FundHandler) GetFund(w http.ResponseWriter, r *http.Request) {
+func (h *FundHandler) GetCapTableByID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := chi.URLParam(r, "id")
-	fund, err := h.FundService.GetFund(ctx, id)
+	fund, err := h.FundService.GetCapTableByID(ctx, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

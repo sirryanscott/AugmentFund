@@ -15,12 +15,12 @@ func NewFundService(dataStore interfaces.DataStorer) *FundService {
 	return &FundService{DataStore: dataStore}
 }
 
-func (s *FundService) GetFunds(ctx context.Context) ([]data.Fund, error) {
-	return s.DataStore.GetFunds(ctx)
+func (s *FundService) GetCapTables(ctx context.Context) ([]data.Fund, error) {
+	return s.DataStore.GetCapTables(ctx)
 }
 
-func (s *FundService) GetFund(ctx context.Context, id string) (*data.Fund, error) {
-	return s.DataStore.GetFund(ctx, id)
+func (s *FundService) GetCapTableByID(ctx context.Context, id string) (*data.Fund, error) {
+	return s.DataStore.GetCapTableByID(ctx, id)
 }
 
 func (s *FundService) CreateFund(ctx context.Context, fund data.Fund) ([]data.Fund, error) {
