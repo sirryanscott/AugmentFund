@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"strconv"
 
 	"github.com/AugmentFund/internal/data"
 )
@@ -30,7 +29,7 @@ func (s *DataStore) GetUsers(ctx context.Context) ([]data.User, error) {
 	return users, nil
 }
 
-func (s *DataStore) GetUser(ctx context.Context, id string) (data.User, error) {
+func (s *DataStore) GetUser(ctx context.Context, id int) (data.User, error) {
 	users, err := loadDataFromFile[[]data.User](usersFilePath, []data.User{})
 	if err != nil {
 		return data.User{}, err
@@ -51,7 +50,7 @@ func (s *DataStore) CreateUser(ctx context.Context, user data.User) ([]data.User
 		return []data.User{}, err
 	}
 
-	id := strconv.Itoa(len(users) + 1)
+	id := len(users) + 1
 	user.ID = id
 
 	users = append(users, user)
@@ -73,7 +72,7 @@ func (s *DataStore) GetCapTables(ctx context.Context) ([]data.Fund, error) {
 	return funds, nil
 }
 
-func (s *DataStore) GetCapTableByID(ctx context.Context, id string) (data.Fund, error) {
+func (s *DataStore) GetCapTableByID(ctx context.Context, id int) (data.Fund, error) {
 	funds, err := loadDataFromFile[[]data.Fund](fundsFilePath, []data.Fund{})
 	if err != nil {
 		return data.Fund{}, err
@@ -94,7 +93,7 @@ func (s *DataStore) CreateFund(ctx context.Context, fund data.Fund) ([]data.Fund
 		return []data.Fund{}, err
 	}
 
-	id := strconv.Itoa(len(funds) + 1)
+	id := len(funds) + 1
 	fund.ID = id
 
 	funds = append(funds, fund)

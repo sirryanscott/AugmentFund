@@ -1,7 +1,7 @@
 package data
 
 type OwnedFund struct {
-	ID       string
-	FundName string
-	Shares   int
+	ID       int    `json:"id"`
+	FundName string `json:"fundName"`
+	Shares   int    `json:"shares"`
 }

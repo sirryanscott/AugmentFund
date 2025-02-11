@@ -1,17 +1,17 @@
 [
   {
-    "id": "1",
+    "id": 1,
     "name": "Fund 1",
     "totalShares": 1000,
     "ownedShares": 1000,
     "owners": {
       "1": {
-        "ID": "1",
+        "ID": 1,
         "Name": "John Doe",
         "TotalShares": 900
       },
       "2": {
-        "ID": "2",
+        "ID": 2,
         "Name": "Jane Doe",
         "TotalShares": 100
       }

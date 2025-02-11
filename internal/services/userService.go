@@ -19,7 +19,7 @@ func (s *UserService) GetUsers(ctx context.Context) ([]data.User, error) {
 	return s.DataStore.GetUsers(ctx)
 }
 
-func (s *UserService) GetUser(ctx context.Context, id string) (data.User, error) {
+func (s *UserService) GetUser(ctx context.Context, id int) (data.User, error) {
 	return s.DataStore.GetUser(ctx, id)
 }
 

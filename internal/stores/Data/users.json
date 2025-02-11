@@ -1,16 +1,22 @@
 [
   {
-    "id": "1",
+    "id": 1,
     "name": "John Doe",
-    "OwnedFunds": null
+    "ownedFunds": [
+        {
+            "id": 1,
+            "fundName": "Fund 1",
+            "shares": 900
+        }
+    ]
   },
   {
-    "id": "2",
+    "id": 2,
     "name": "Jane Doe",
     "OwnedFunds": null
   },
   {
-    "id": "3",
+    "id": 3,
     "name": "Ryan Struthers",
     "OwnedFunds": null
   }

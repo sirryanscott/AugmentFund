@@ -1,13 +1,13 @@
 package data
 
 type User struct {
-	ID         string `json:"id"`
-	Name       string `json:"name"`
-	OwnedFunds []OwnedFund
+	ID         int         `json:"id"`
+	Name       string      `json:"name"`
+	OwnedFunds []OwnedFund `json:"ownedFunds"`
 }
 
 type Owner struct {
-	ID          string
+	ID          int
 	Name        string
 	TotalShares int
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/AugmentFund/internal/data"
 	"github.com/AugmentFund/internal/services"
@@ -30,7 +31,8 @@ func (h *FundHandler) GetCapTables(w http.ResponseWriter, r *http.Request) {
 func (h *FundHandler) GetCapTableByID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := chi.URLParam(r, "id")
-	fund, err := h.FundService.GetCapTableByID(ctx, id)
+	idInt, _ := strconv.Atoi(id)
+	fund, err := h.FundService.GetCapTableByID(ctx, idInt)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

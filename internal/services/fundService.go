@@ -20,7 +20,7 @@ func (s *FundService) GetCapTables(ctx context.Context) ([]data.Fund, error) {
 	return s.DataStore.GetCapTables(ctx)
 }
 
-func (s *FundService) GetCapTableByID(ctx context.Context, id string) (data.Fund, error) {
+func (s *FundService) GetCapTableByID(ctx context.Context, id int) (data.Fund, error) {
 	return s.DataStore.GetCapTableByID(ctx, id)
 }
 
@@ -28,6 +28,11 @@ func (s *FundService) CreateFund(ctx context.Context, fund data.Fund) ([]data.Fu
 	return s.DataStore.CreateFund(ctx, fund)
 }
 
+// TODO:
+//
+//	clean up this function with helper functions
+//	need to create history
+//	need to update the ownedFunds on the users
 func (s *FundService) CreateTransfer(ctx context.Context, transferData data.Transfer) ([]data.Fund, error) {
 	// get the fund
 	fund, err := s.DataStore.GetCapTableByID(ctx, transferData.FundID)
@@ -35,7 +40,7 @@ func (s *FundService) CreateTransfer(ctx context.Context, transferData data.Tran
 		return []data.Fund{}, fmt.Errorf("error getting fund")
 	}
 
-	if transferData.FromOwnerID == "" && transferData.ToOwnerID == "" {
+	if transferData.FromOwnerID == 0 && transferData.ToOwnerID == 0 {
 		return []data.Fund{}, fmt.Errorf("incomplete transfer data")
 	}
 
@@ -77,7 +82,7 @@ func (s *FundService) CreateTransfer(ctx context.Context, transferData data.Tran
 		return []data.Fund{}, fmt.Errorf("not enough shares to transfer")
 	}
 
-	if transferData.ToOwnerID == "" {
+	if transferData.ToOwnerID == 0 {
 		// transfer to unonwed shares
 		fund.OwnedShares -= transferData.Shares
 		fromOwner.TotalShares -= transferData.Shares
@@ -106,8 +111,8 @@ func (s *FundService) CreateTransfer(ctx context.Context, transferData data.Tran
 	fund.Owners[transferData.FromOwnerID] = fromOwner
 	fund.Owners[transferData.ToOwnerID] = toOwner
 
-	// save the new fund data
 	// create history record
 
+	// save the new fund data
 	return s.DataStore.UpdateFund(ctx, fund)
 }

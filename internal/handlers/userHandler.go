@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/AugmentFund/internal/data"
 	"github.com/AugmentFund/internal/services"
@@ -36,7 +37,8 @@ func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := chi.URLParam(r, "id")
-	user, err := h.UserService.GetUser(ctx, id)
+	idInt, _ := strconv.Atoi(id)
+	user, err := h.UserService.GetUser(ctx, idInt)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
