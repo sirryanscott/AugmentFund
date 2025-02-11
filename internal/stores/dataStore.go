@@ -29,6 +29,14 @@ func NewDataStore() *DataStore {
 				ID:          "1",
 				Name:        "Fund 1",
 				TotalShares: 1000,
+				OwnedShares: 1000,
+				Owners: []data.Owner{
+					{
+						ID:          "1",
+						Name:        "John Doe",
+						TotalShares: 1000,
+					},
+				},
 			},
 		},
 	}
@@ -61,10 +69,18 @@ func (s *DataStore) CreateUser(ctx context.Context, user data.User) ([]data.User
 }
 
 func (s *DataStore) GetFunds(ctx context.Context) ([]data.Fund, error) {
-	return []data.Fund{}, nil
+	if s.Funds == nil {
+		s.Funds = []data.Fund{}
+	}
+	return s.Funds, nil
 }
 
 func (s *DataStore) GetFund(ctx context.Context, id string) (*data.Fund, error) {
+	for _, fund := range s.Funds {
+		if fund.ID == id {
+			return &fund, nil
+		}
+	}
 	return &data.Fund{}, nil
 }
 

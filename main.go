@@ -16,6 +16,7 @@ import (
 func main() {
 	newDataStore := stores.NewDataStore()
 	userHandler := handlers.NewUserHandler(services.NewUserService(newDataStore))
+	fundHandler := handlers.NewFundHandler(services.NewFundService(newDataStore))
 	r := chi.NewRouter()
 
 	// CORS middleware configuration

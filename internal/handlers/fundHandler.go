@@ -1,5 +1,60 @@
 package handlers
 
+import (
+	"encoding/json"
+	"net/http"
+
+	"github.com/AugmentFund/internal/data"
+	"github.com/AugmentFund/internal/services"
+	"github.com/go-chi/chi"
+)
+
 type FundHandler struct {
 	FundService *services.FundService
+}
+
+func NewFundHandler(fundService *services.FundService) *FundHandler {
+	return &FundHandler{FundService: fundService}
+}
+
+func (h *FundHandler) GetFunds(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	funds, err := h.FundService.GetFunds(ctx)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(funds)
+}
+
+func (h *FundHandler) GetFund(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	id := chi.URLParam(r, "id")
+	fund, err := h.FundService.GetFund(ctx, id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(fund)
+}
+
+func (h *FundHandler) CreateFund(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	fundBytes, err := ioReaderToBytes(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	var fund data.Fund
+	err = json.Unmarshal(fundBytes, &fund)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	funds, err := h.FundService.CreateFund(ctx, fund)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(funds)
 }
