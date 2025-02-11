@@ -1,15 +1,22 @@
 [
-    {
-        "id": "1",
-        "name": "Fund 1",
-        "totalShares": 1000,
-        "ownedShares": 1000,
-        "owners": [
-            {
-                "id": "1",
-                "name": "John Doe",
-                "totalShares": 1000
-            }
-        ]
-    }
+  {
+    "id": "1",
+    "name": "Fund 1",
+    "totalShares": 1000,
+    "ownedShares": 1000,
+    "owners": [
+      {
+        "ID": "1",
+        "Name": "John Doe",
+        "TotalShares": 1000
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "The new Fund",
+    "totalShares": 1000,
+    "ownedShares": 0,
+    "owners": null
+  }
 ]
