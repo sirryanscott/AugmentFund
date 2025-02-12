@@ -11,8 +11,6 @@ import (
 	"github.com/go-chi/cors"
 )
 
-// TODO use router
-// TODO errors
 func main() {
 	newDataStore := stores.NewDataStore()
 	userHandler := handlers.NewUserHandler(services.NewUserService(newDataStore))
