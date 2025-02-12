@@ -2,9 +2,12 @@
 
 ## Overview
 AugmentFund is a small golang application to manage shares for a fund (company) between different owners. This application is a service that is interfaced via a REST API. Start the program by running the command below from the root of the project
+
 ```go run main.go```
 
-A postman collection can be found [here]("https://www.postman.com/sirryanscott/workspace/augment-fund/collection/5904405-d4dfc752-0bbf-43d4-a359-646b281ebf03?action=share&creator=5904405") that can be used to interact with the application
+A postman collection can be found here that can be used to interact with the application
+
+```https://www.postman.com/sirryanscott/workspace/augment-fund/collection/5904405-d4dfc752-0bbf-43d4-a359-646b281ebf03?action=share&creator=5904405```
 
 ## Assumptions
 * When a Fund is created, the total shares remain with the fund initally.
@@ -19,6 +22,7 @@ A postman collection can be found [here]("https://www.postman.com/sirryanscott/w
 
 ## Testing
 A series of unit tests can be found and executed by running this code from the root of the project:
+
 ```go test ./...```
 
 ## Other Thoughts and Potential Future Enhancements
