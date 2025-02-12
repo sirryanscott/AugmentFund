@@ -31,3 +31,4 @@ This project can be further enhanced with these additional features (list not ex
 * concurrency: this small application wouldn't necessarily benefit from concurrency, but as load increases it would help with effeciency and speed
 * logging: logging could be improved for better readibility into various error states
 * the database is built around an interface to allow for a better storage solution (other than a file)
+* API and input validation can be enhanced
