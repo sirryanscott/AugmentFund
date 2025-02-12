@@ -30,9 +30,7 @@ func (s *FundService) CreateFund(ctx context.Context, fund data.Fund) ([]data.Fu
 
 // TODO:
 //
-//	clean up this function with helper functions
 //	need to create history
-//	need to update the ownedFunds on the users
 func (s *FundService) CreateTransfer(ctx context.Context, transferData data.Transfer) ([]data.Fund, error) {
 	// get the fund
 	fund, err := s.DataStore.GetCapTableByID(ctx, transferData.FundID)
@@ -40,68 +38,64 @@ func (s *FundService) CreateTransfer(ctx context.Context, transferData data.Tran
 		return []data.Fund{}, fmt.Errorf("error getting fund")
 	}
 
-	if transferData.FromOwnerID == 0 && transferData.ToOwnerID == 0 {
-		return []data.Fund{}, fmt.Errorf("incomplete transfer data")
+	// check for invalid transfer data
+	err = validateTransferData(transferData)
+	if err != nil {
+		return []data.Fund{}, err
 	}
 
-	// update the shares from the transfer data
+	switch {
+	// transfer between two owners
+	case transferData.FromOwnerID != 0 && transferData.ToOwnerID != 0:
+		err = s.transferFromOwnerToOwner(ctx, &fund, transferData)
+	// transfer from fund to owner
+	case transferData.FromOwnerID == 0 && transferData.ToOwnerID != 0:
+		err = s.transferFromFundToOwner(ctx, &fund, transferData)
+	// transfer from owner to fund
+	case transferData.FromOwnerID != 0 && transferData.ToOwnerID == 0:
+		err = s.transferFromOwnerToFund(&fund, transferData)
+	}
+
+	if err != nil {
+		return []data.Fund{}, err
+	}
+
+	// create history record don't forget sorting
+	// save the new fund data
+	return s.DataStore.UpdateFund(ctx, fund)
+}
+
+func validateTransferData(transferData data.Transfer) error {
+	if transferData.FromOwnerID == transferData.ToOwnerID {
+		return fmt.Errorf("transfer data invalid: from owner must not match to owner")
+	}
+	if transferData.FromOwnerID == 0 && transferData.ToOwnerID == 0 {
+		return fmt.Errorf("transfer data invalid: no owners specified in transfer")
+	}
+	if transferData.Shares < 0 {
+		return fmt.Errorf("transfer data invalid: shares must be positive")
+	}
+	return nil
+}
+
+func (s *FundService) transferFromOwnerToOwner(ctx context.Context, fund *data.Fund, transferData data.Transfer) (err error) {
 	fromOwner, ok := fund.Owners[transferData.FromOwnerID]
 	if !ok {
-		// if there is no from owner, then we are assuming an initial transfer from the fund to an owner
-		// check if there is unowned shares
-		unownedShares := fund.TotalShares - fund.OwnedShares
-		if unownedShares <= 0 {
-			return []data.Fund{}, fmt.Errorf("no shares to transfer")
-		}
-
-		if unownedShares < transferData.Shares {
-			return []data.Fund{}, fmt.Errorf("not enough unowned shares to transfer")
-		}
-
-		toOwner, ok := fund.Owners[transferData.ToOwnerID]
-		if !ok {
-			// get owner from users
-			user, err := s.DataStore.GetUser(ctx, transferData.ToOwnerID)
-			if err != nil {
-				return []data.Fund{}, fmt.Errorf("error getting user")
-			}
-			toOwner.ID = user.ID
-			toOwner.Name = user.Name
-		}
-
-		toOwner.TotalShares += transferData.Shares
-		fund.Owners[transferData.ToOwnerID] = toOwner
-
-		fund.OwnedShares += transferData.Shares
-		return s.DataStore.UpdateFund(ctx, fund)
-
+		return fmt.Errorf("owner doesn't exist")
 	}
 
-	// from owner needs to have enough shares to transer
 	if fromOwner.TotalShares < transferData.Shares {
-		return []data.Fund{}, fmt.Errorf("not enough shares to transfer")
-	}
-
-	if transferData.ToOwnerID == 0 {
-		// transfer to unonwed shares
-		fund.OwnedShares -= transferData.Shares
-		fromOwner.TotalShares -= transferData.Shares
-		fund.Owners[transferData.FromOwnerID] = fromOwner
-		// TODO: save data
-		return s.DataStore.UpdateFund(ctx, fund)
+		return fmt.Errorf("not enough shares to transfer")
 	}
 
 	toOwner, ok := fund.Owners[transferData.ToOwnerID]
 	if !ok {
 		// see if user exists with the same id
 		if !ok {
-			// get owner from users
-			user, err := s.DataStore.GetUser(ctx, transferData.ToOwnerID)
+			toOwner, err = s.createOwnerFromUserData(ctx, transferData)
 			if err != nil {
-				return []data.Fund{}, fmt.Errorf("error getting user")
+				return err
 			}
-			toOwner.ID = user.ID
-			toOwner.Name = user.Name
 		}
 	}
 
@@ -109,10 +103,69 @@ func (s *FundService) CreateTransfer(ctx context.Context, transferData data.Tran
 	toOwner.TotalShares += transferData.Shares
 
 	fund.Owners[transferData.FromOwnerID] = fromOwner
+	if fromOwner.TotalShares == 0 {
+		delete(fund.Owners, fromOwner.ID)
+	}
+
+	fund.Owners[transferData.ToOwnerID] = toOwner
+	return
+}
+
+func (s *FundService) transferFromFundToOwner(ctx context.Context, fund *data.Fund, transferData data.Transfer) (err error) {
+	// if there is no from owner, then we are assuming an initial transfer from the fund to an owner
+	// check if there is unowned shares
+	unownedShares := fund.TotalShares - fund.OwnedShares
+	if unownedShares <= 0 {
+		return fmt.Errorf("no shares to transfer")
+	}
+
+	if unownedShares < transferData.Shares {
+		return fmt.Errorf("not enough unowned shares to transfer")
+	}
+
+	toOwner, ok := fund.Owners[transferData.ToOwnerID]
+	if !ok {
+		// get owner from users
+		toOwner, err = s.createOwnerFromUserData(ctx, transferData)
+		if err != nil {
+			return err
+		}
+	}
+
+	toOwner.TotalShares += transferData.Shares
 	fund.Owners[transferData.ToOwnerID] = toOwner
 
-	// create history record
-
-	// save the new fund data
-	return s.DataStore.UpdateFund(ctx, fund)
+	fund.OwnedShares += transferData.Shares
+	return
 }
+
+func (s *FundService) transferFromOwnerToFund(fund *data.Fund, transferData data.Transfer) (err error) {
+	fromOwner, ok := fund.Owners[transferData.FromOwnerID]
+	if !ok {
+		return fmt.Errorf("owner not found")
+	}
+
+	if fromOwner.TotalShares < transferData.Shares {
+		return fmt.Errorf("not enough shares to transfer")
+	}
+
+	fund.OwnedShares -= transferData.Shares
+	fromOwner.TotalShares -= transferData.Shares
+	fund.Owners[transferData.FromOwnerID] = fromOwner
+
+	return nil
+}
+
+func (s *FundService) createOwnerFromUserData(ctx context.Context, transferData data.Transfer) (owner data.Owner, err error) {
+	// get owner from users
+	user, err := s.DataStore.GetUser(ctx, transferData.ToOwnerID)
+	if err != nil {
+		return data.Owner{}, fmt.Errorf("error getting user")
+	}
+	owner.ID = user.ID
+	owner.Name = user.Name
+	return
+}
+
+// TODO if a new user gets some shares in a transfer add the fund to the "ownedFunds"
+// TODO if a owner loses all shares, remove the fund from owner's "ownedFunds" array
