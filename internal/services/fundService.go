@@ -72,7 +72,7 @@ func validateTransferData(transferData data.Transfer) error {
 	if transferData.FromOwnerID == 0 && transferData.ToOwnerID == 0 {
 		return fmt.Errorf("transfer data invalid: no owners specified in transfer")
 	}
-	if transferData.Shares < 0 {
+	if transferData.Shares <= 0 {
 		return fmt.Errorf("transfer data invalid: shares must be positive")
 	}
 	return nil
