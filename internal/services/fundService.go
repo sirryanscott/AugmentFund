@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/AugmentFund/internal/data"
@@ -59,6 +60,10 @@ func (s *FundService) CreateTransfer(ctx context.Context, transferData data.Tran
 	}
 
 	// create history record don't forget sorting
+	err = s.createTransferHistoryRecord(ctx, fund, transferData)
+	if err != nil {
+		return []data.Fund{}, err
+	}
 	// save the new fund data
 	return s.DataStore.UpdateFund(ctx, fund)
 }
@@ -285,4 +290,56 @@ func updateUsersOwnedFundsData(fromUser, toUser *data.User, transferData data.Tr
 			}
 		}
 	}
+}
+
+func (s *FundService) createTransferHistoryRecord(ctx context.Context, fund data.Fund, transferData data.Transfer) error {
+	fromOwner := data.Owner{
+		ID:   transferData.FromOwnerID,
+		Name: fund.Name,
+	}
+
+	if fromOwner.ID != 0 {
+		owner, err := s.DataStore.GetUser(ctx, fromOwner.ID)
+		if err != nil {
+			return fmt.Errorf("error getting from owner data")
+		}
+		fromOwner.Name = owner.Name
+	}
+
+	toOwner := data.Owner{
+		ID:   transferData.ToOwnerID,
+		Name: fund.Name,
+	}
+
+	if toOwner.ID != 0 {
+		owner, err := s.DataStore.GetUser(ctx, toOwner.ID)
+		if err != nil {
+			return fmt.Errorf("error getting to owner data")
+		}
+		toOwner.Name = owner.Name
+	}
+
+	transferHistoryRecord := data.TransferHistory{
+		FundID:    transferData.FundID,
+		FundName:  fund.Name,
+		FromOwner: fromOwner,
+		ToOwner:   toOwner,
+		Shares:    transferData.Shares,
+		Date:      time.Now().Format("2006-01-02 15:04:05"),
+	}
+
+	return s.DataStore.CreateTransferHistoryRecord(ctx, transferHistoryRecord)
+}
+
+func (s *FundService) GetTransferHistoryForFund(ctx context.Context, fundID int) ([]data.TransferHistory, error) {
+	transferHistoryRecords, err := s.DataStore.GetTransferHistoryForFund(ctx, fundID)
+	if err != nil {
+		return []data.TransferHistory{}, err
+	}
+
+	sort.Slice(transferHistoryRecords, func(i, j int) bool {
+		return transferHistoryRecords[i].Date > transferHistoryRecords[j].Date
+	})
+
+	return transferHistoryRecords, nil
 }

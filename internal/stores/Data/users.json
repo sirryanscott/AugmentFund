@@ -8,6 +8,12 @@
         "fundName": "Fund 1",
         "shares": 100,
         "dateAcquired": "2025-02-11 22:20:46"
+      },
+      {
+        "id": 2,
+        "fundName": "An Awesome Fund",
+        "shares": 1900,
+        "dateAcquired": "2025-02-11 23:12:20"
       }
     ]
   },
@@ -24,14 +30,21 @@
       {
         "id": 2,
         "fundName": "An Awesome Fund",
-        "shares": 700,
-        "dateAcquired": "2025-02-11 22:24:31"
+        "shares": 100,
+        "dateAcquired": "2025-02-11 23:12:20"
       }
     ]
   },
   {
     "id": 3,
     "name": "Ryan Struthers",
-    "ownedFunds": null
+    "ownedFunds": [
+      {
+        "id": 2,
+        "fundName": "An Awesome Fund",
+        "shares": 600,
+        "dateAcquired": "2025-02-11 23:12:59"
+      }
+    ]
   }
 ]

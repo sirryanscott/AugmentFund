@@ -23,13 +23,25 @@
     "id": 2,
     "name": "An Awesome Fund",
     "totalShares": 2000,
-    "ownedShares": 700,
+    "ownedShares": 2000,
     "owners": {
+      "1": {
+        "id": 1,
+        "name": "John Doe",
+        "totalShares": 1300,
+        "dateAcquired": "2025-02-11 23:12:20"
+      },
       "2": {
         "id": 2,
         "name": "Jane Doe",
-        "totalShares": 700,
+        "totalShares": 100,
         "dateAcquired": "2025-02-11 22:24:31"
+      },
+      "3": {
+        "id": 3,
+        "name": "Ryan Struthers",
+        "totalShares": 600,
+        "dateAcquired": "2025-02-11 23:12:59"
       }
     }
   }

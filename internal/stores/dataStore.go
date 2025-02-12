@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	usersFilePath = "internal/stores/Data/users.json"
-	fundsFilePath = "internal/stores/Data/funds.json"
+	usersFilePath           = "internal/stores/Data/users.json"
+	fundsFilePath           = "internal/stores/Data/funds.json"
+	transferHistoryFilePath = "internal/stores/Data/transferHistory.json"
 )
 
 type DataStore struct{}
@@ -148,6 +149,42 @@ func (s *DataStore) UpdateFund(ctx context.Context, fund data.Fund) ([]data.Fund
 	}
 
 	return funds, nil
+}
+
+func (s *DataStore) GetTransferHistoryForFund(ctx context.Context, fundID int) ([]data.TransferHistory, error) {
+	transferHistoryRawData, err := loadDataFromFile[[]data.TransferHistory](transferHistoryFilePath, []data.TransferHistory{})
+	if err != nil {
+		return []data.TransferHistory{}, err
+	}
+
+	transferHistory := []data.TransferHistory{}
+	for _, r := range transferHistoryRawData {
+		if r.FundID != fundID {
+			continue
+		}
+		transferHistory = append(transferHistory, r)
+	}
+
+	return transferHistory, nil
+}
+
+func (s *DataStore) CreateTransferHistoryRecord(ctx context.Context, transferHistory data.TransferHistory) error {
+	transferHistoryRecords, err := loadDataFromFile[[]data.TransferHistory](transferHistoryFilePath, []data.TransferHistory{})
+	if err != nil {
+		return err
+	}
+
+	id := len(transferHistoryRecords) + 1
+	transferHistory.ID = id
+
+	transferHistoryRecords = append(transferHistoryRecords, transferHistory)
+
+	err = s.saveDataToFile(transferHistoryFilePath, transferHistoryRecords)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func loadDataFromFile[T any](filePath string, data T) (T, error) {

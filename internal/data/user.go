@@ -9,8 +9,8 @@ type User struct {
 type Owner struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
-	TotalShares int    `json:"totalShares"`
-	Date        string `json:"dateAcquired"`
+	TotalShares int    `json:"totalShares,omitempty"`
+	Date        string `json:"dateAcquired,omitempty"`
 }
 
 func (u *User) HasFund(fundID int) bool {

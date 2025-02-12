@@ -83,3 +83,15 @@ func (h *FundHandler) CreateTransfer(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(funds)
 }
+
+func (h *FundHandler) GetTransferHistoryForFund(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	id := chi.URLParam(r, "id")
+	idInt, _ := strconv.Atoi(id)
+	transferHistoryRecords, err := h.FundService.GetTransferHistoryForFund(ctx, idInt)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(transferHistoryRecords)
+}

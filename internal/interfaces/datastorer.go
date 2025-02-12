@@ -16,4 +16,7 @@ type DataStorer interface {
 	GetCapTableByID(ctx context.Context, id int) (data.Fund, error)
 	CreateFund(ctx context.Context, fund data.Fund) ([]data.Fund, error)
 	UpdateFund(ctx context.Context, fund data.Fund) ([]data.Fund, error)
+
+	GetTransferHistoryForFund(ctx context.Context, fundID int) ([]data.TransferHistory, error)
+	CreateTransferHistoryRecord(ctx context.Context, transferHistoryRecord data.TransferHistory) error
 }
