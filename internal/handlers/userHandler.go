@@ -11,9 +11,6 @@ import (
 	"github.com/go-chi/chi"
 )
 
-//TODO use json marshaller
-//TODO use context
-
 // UserHandler is a handler for user routes
 type UserHandler struct {
 	UserService *services.UserService

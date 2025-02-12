@@ -12,3 +12,12 @@ type Owner struct {
 	TotalShares int    `json:"totalShares"`
 	Date        string `json:"dateAcquired"`
 }
+
+func (u *User) HasFund(fundID int) bool {
+	for _, fund := range u.OwnedFunds {
+		if fundID == fund.ID {
+			return true
+		}
+	}
+	return false
+}

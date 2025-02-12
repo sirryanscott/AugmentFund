@@ -63,6 +63,28 @@ func (s *DataStore) CreateUser(ctx context.Context, user data.User) ([]data.User
 	return users, nil
 }
 
+func (s *DataStore) UpdateUser(ctx context.Context, user data.User) (data.User, error) {
+	users, err := loadDataFromFile[[]data.User](usersFilePath, []data.User{})
+	if err != nil {
+		return data.User{}, err
+	}
+
+	for i, userFromDB := range users {
+		if userFromDB.ID == user.ID {
+			users[i] = user
+			break
+		}
+	}
+
+	err = s.saveDataToFile(usersFilePath, users)
+	if err != nil {
+		return data.User{}, err
+	}
+
+	return user, nil
+
+}
+
 func (s *DataStore) GetCapTables(ctx context.Context) ([]data.Fund, error) {
 	funds, err := loadDataFromFile[[]data.Fund](fundsFilePath, []data.Fund{})
 	if err != nil {
@@ -95,6 +117,7 @@ func (s *DataStore) CreateFund(ctx context.Context, fund data.Fund) ([]data.Fund
 
 	id := len(funds) + 1
 	fund.ID = id
+	fund.Owners = make(map[int]data.Owner)
 
 	funds = append(funds, fund)
 

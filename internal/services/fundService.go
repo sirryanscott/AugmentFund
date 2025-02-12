@@ -29,9 +29,6 @@ func (s *FundService) CreateFund(ctx context.Context, fund data.Fund) ([]data.Fu
 	return s.DataStore.CreateFund(ctx, fund)
 }
 
-// TODO:
-//
-//	need to create history
 func (s *FundService) CreateTransfer(ctx context.Context, transferData data.Transfer) ([]data.Fund, error) {
 	// get the fund
 	fund, err := s.DataStore.GetCapTableByID(ctx, transferData.FundID)
@@ -54,7 +51,7 @@ func (s *FundService) CreateTransfer(ctx context.Context, transferData data.Tran
 		err = s.transferFromFundToOwner(ctx, &fund, transferData)
 	// transfer from owner to fund
 	case transferData.FromOwnerID != 0 && transferData.ToOwnerID == 0:
-		err = s.transferFromOwnerToFund(&fund, transferData)
+		err = s.transferFromOwnerToFund(ctx, &fund, transferData)
 	}
 
 	if err != nil {
@@ -106,11 +103,18 @@ func (s *FundService) transferFromOwnerToOwner(ctx context.Context, fund *data.F
 	fund.Owners[transferData.FromOwnerID] = fromOwner
 	if fromOwner.TotalShares == 0 {
 		delete(fund.Owners, fromOwner.ID)
+		// remove fund from user
+		err = s.removeFundFromUser(ctx, fromOwner.ID, fund.ID)
+		if err != nil {
+			return err
+		}
 	}
 
 	toOwner.Date = time.Now().Format("2006-01-02 15:04:05")
 
 	fund.Owners[transferData.ToOwnerID] = toOwner
+
+	err = s.updateUserTransferData(ctx, fromOwner.ID, toOwner.ID, transferData)
 	return
 }
 
@@ -141,10 +145,12 @@ func (s *FundService) transferFromFundToOwner(ctx context.Context, fund *data.Fu
 	fund.Owners[transferData.ToOwnerID] = toOwner
 
 	fund.OwnedShares += transferData.Shares
+
+	err = s.updateUserTransferData(ctx, 0, toOwner.ID, transferData)
 	return
 }
 
-func (s *FundService) transferFromOwnerToFund(fund *data.Fund, transferData data.Transfer) (err error) {
+func (s *FundService) transferFromOwnerToFund(ctx context.Context, fund *data.Fund, transferData data.Transfer) (err error) {
 	fromOwner, ok := fund.Owners[transferData.FromOwnerID]
 	if !ok {
 		return fmt.Errorf("owner not found")
@@ -158,7 +164,18 @@ func (s *FundService) transferFromOwnerToFund(fund *data.Fund, transferData data
 	fromOwner.TotalShares -= transferData.Shares
 	fund.Owners[transferData.FromOwnerID] = fromOwner
 
-	return nil
+	if fromOwner.TotalShares == 0 {
+		delete(fund.Owners, fromOwner.ID)
+		// remove fund from user
+		err = s.removeFundFromUser(ctx, fromOwner.ID, fund.ID)
+		if err != nil {
+			return
+		}
+	} else {
+		err = s.updateUserTransferData(ctx, fromOwner.ID, 0, transferData)
+	}
+
+	return
 }
 
 func (s *FundService) createOwnerFromUserData(ctx context.Context, transferData data.Transfer) (owner data.Owner, err error) {
@@ -169,8 +186,103 @@ func (s *FundService) createOwnerFromUserData(ctx context.Context, transferData 
 	}
 	owner.ID = user.ID
 	owner.Name = user.Name
+
 	return
 }
 
-// TODO if a new user gets some shares in a transfer add the fund to the "ownedFunds"
-// TODO if a owner loses all shares, remove the fund from owner's "ownedFunds" array
+func (s *FundService) removeFundFromUser(ctx context.Context, userId, fundId int) error {
+	user, err := s.DataStore.GetUser(ctx, userId)
+	if err != nil {
+		return fmt.Errorf("error getting user")
+	}
+
+	for i, fund := range user.OwnedFunds {
+		if fund.ID == fundId {
+			user.OwnedFunds = append(user.OwnedFunds[:i], user.OwnedFunds[i+1:]...)
+			break
+		}
+	}
+
+	_, err = s.DataStore.UpdateUser(ctx, user)
+	return err
+}
+
+func (s *FundService) addFundToUser(ctx context.Context, user *data.User, fundId int, shares int) error {
+	fund, err := s.DataStore.GetCapTableByID(ctx, fundId)
+	if err != nil {
+		return fmt.Errorf("error getting fund cap table")
+	}
+
+	user.OwnedFunds = append(user.OwnedFunds, data.OwnedFund{
+		ID:       fund.ID,
+		FundName: fund.Name,
+		Shares:   shares,
+		Date:     time.Now().Format("2006-01-02 15:04:05"),
+	})
+
+	return nil
+}
+
+func (s *FundService) updateUserTransferData(ctx context.Context, fromUserID, toUserID int, transferData data.Transfer) (err error) {
+	var fromUser data.User
+	var toUser data.User
+
+	if fromUserID != 0 {
+		fromUser, err = s.DataStore.GetUser(ctx, fromUserID)
+		if err != nil {
+			return fmt.Errorf("error getting from user data")
+		}
+	}
+
+	if toUserID != 0 {
+		toUser, err = s.DataStore.GetUser(ctx, toUserID)
+		if err != nil {
+			return fmt.Errorf("error getting to user data")
+		}
+	}
+
+	if !toUser.HasFund(transferData.FundID) && toUserID != 0 {
+		err = s.addFundToUser(ctx, &toUser, transferData.FundID, transferData.Shares)
+		if err != nil {
+			return fmt.Errorf("error adding fund to user data")
+		}
+	} else {
+		updateUsersOwnedFundsData(&fromUser, &toUser, transferData)
+	}
+
+	if fromUserID != 0 {
+		_, err = s.DataStore.UpdateUser(ctx, fromUser)
+		if err != nil {
+			return fmt.Errorf("error updating from user data")
+		}
+	}
+
+	if toUserID != 0 {
+		_, err = s.DataStore.UpdateUser(ctx, toUser)
+		if err != nil {
+			return fmt.Errorf("error updating from user data")
+		}
+	}
+
+	return nil
+}
+
+func updateUsersOwnedFundsData(fromUser, toUser *data.User, transferData data.Transfer) {
+	if fromUser.ID != 0 {
+		for i, fund := range fromUser.OwnedFunds {
+			if fund.ID == transferData.FundID {
+				fromUser.OwnedFunds[i].Shares -= transferData.Shares
+				fromUser.OwnedFunds[i].Date = time.Now().Format("2006-01-02 15:04:05")
+			}
+		}
+	}
+
+	if toUser.ID != 0 {
+		for i, fund := range toUser.OwnedFunds {
+			if fund.ID == transferData.FundID {
+				toUser.OwnedFunds[i].Shares += transferData.Shares
+				toUser.OwnedFunds[i].Date = time.Now().Format("2006-01-02 15:04:05")
+			}
+		}
+	}
+}

@@ -3,19 +3,33 @@
     "id": 1,
     "name": "Fund 1",
     "totalShares": 1000,
-    "ownedShares": 1000,
+    "ownedShares": 700,
     "owners": {
       "1": {
         "id": 1,
         "name": "John Doe",
-        "totalShares": 500,
-        "dateAcquired": "2025-02-11 21:09:33"
+        "totalShares": 100,
+        "dateAcquired": "2025-02-11 22:20:28"
       },
       "2": {
         "id": 2,
         "name": "Jane Doe",
-        "totalShares": 500,
-        "dateAcquired": "2025-02-11 21:09:41"
+        "totalShares": 600,
+        "dateAcquired": "2025-02-11 22:20:46"
+      }
+    }
+  },
+  {
+    "id": 2,
+    "name": "An Awesome Fund",
+    "totalShares": 2000,
+    "ownedShares": 700,
+    "owners": {
+      "2": {
+        "id": 2,
+        "name": "Jane Doe",
+        "totalShares": 700,
+        "dateAcquired": "2025-02-11 22:24:31"
       }
     }
   }
