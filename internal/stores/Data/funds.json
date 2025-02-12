@@ -6,14 +6,16 @@
     "ownedShares": 1000,
     "owners": {
       "1": {
-        "ID": 1,
-        "Name": "John Doe",
-        "TotalShares": 500
+        "id": 1,
+        "name": "John Doe",
+        "totalShares": 500,
+        "dateAcquired": "2025-02-11 21:09:33"
       },
       "2": {
-        "ID": 2,
-        "Name": "Jane Doe",
-        "TotalShares": 500
+        "id": 2,
+        "name": "Jane Doe",
+        "totalShares": 500,
+        "dateAcquired": "2025-02-11 21:09:41"
       }
     }
   }

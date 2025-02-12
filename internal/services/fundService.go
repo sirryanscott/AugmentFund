@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/AugmentFund/internal/data"
 	"github.com/AugmentFund/internal/interfaces"
@@ -107,6 +108,8 @@ func (s *FundService) transferFromOwnerToOwner(ctx context.Context, fund *data.F
 		delete(fund.Owners, fromOwner.ID)
 	}
 
+	toOwner.Date = time.Now().Format("2006-01-02 15:04:05")
+
 	fund.Owners[transferData.ToOwnerID] = toOwner
 	return
 }
@@ -133,6 +136,8 @@ func (s *FundService) transferFromFundToOwner(ctx context.Context, fund *data.Fu
 	}
 
 	toOwner.TotalShares += transferData.Shares
+	toOwner.Date = time.Now().Format("2006-01-02 15:04:05")
+
 	fund.Owners[transferData.ToOwnerID] = toOwner
 
 	fund.OwnedShares += transferData.Shares

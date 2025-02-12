@@ -7,7 +7,8 @@ type User struct {
 }
 
 type Owner struct {
-	ID          int
-	Name        string
-	TotalShares int
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	TotalShares int    `json:"totalShares"`
+	Date        string `json:"dateAcquired"`
 }
