@@ -8,14 +8,14 @@
       "1": {
         "id": 1,
         "name": "John Doe",
-        "totalShares": 100,
-        "dateAcquired": "2025-02-11 22:20:28"
+        "totalShares": 200,
+        "dateAcquired": "2025-02-12 10:57:04"
       },
       "2": {
         "id": 2,
         "name": "Jane Doe",
-        "totalShares": 600,
-        "dateAcquired": "2025-02-11 22:20:46"
+        "totalShares": 300,
+        "dateAcquired": "2025-02-12 10:55:39"
       }
     }
   },

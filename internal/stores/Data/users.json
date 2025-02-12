@@ -6,8 +6,8 @@
       {
         "id": 1,
         "fundName": "Fund 1",
-        "shares": 100,
-        "dateAcquired": "2025-02-11 22:20:46"
+        "shares": 200,
+        "dateAcquired": "2025-02-12 10:57:26"
       },
       {
         "id": 2,
@@ -24,8 +24,8 @@
       {
         "id": 1,
         "fundName": "Fund 1",
-        "shares": 600,
-        "dateAcquired": "2025-02-11 22:20:46"
+        "shares": 300,
+        "dateAcquired": "2025-02-12 10:56:41"
       },
       {
         "id": 2,
