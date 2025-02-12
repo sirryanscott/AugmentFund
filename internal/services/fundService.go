@@ -59,11 +59,12 @@ func (s *FundService) CreateTransfer(ctx context.Context, transferData data.Tran
 		return []data.Fund{}, err
 	}
 
-	// create history record don't forget sorting
+	// create history record sorted by date descending
 	err = s.createTransferHistoryRecord(ctx, fund, transferData)
 	if err != nil {
 		return []data.Fund{}, err
 	}
+
 	// save the new fund data
 	return s.DataStore.UpdateFund(ctx, fund)
 }
