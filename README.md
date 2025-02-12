@@ -13,7 +13,7 @@ A postman collection can be found here that can be used to interact with the app
 * When a Fund is created, the total shares remain with the fund initally.
 * When creating a transfer, a `fromOwnerId = 0` will indicate that shares are being transferred from the fund to an owner
 * When creating a transfer, a `toOwnerId = 0` will indicate that shares are being transferred from the owner back to the fund
-* Transferring between owners is not allowed
+* Transferring between the same owner is not allowed
 * Only available shares can be transferred
 * If an owner transfers all of their available shares, the owner is removed from the cap table
 * If a transfer happens to an existing user that does not have any shares, then the owner is created for the fund
