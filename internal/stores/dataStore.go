@@ -53,6 +53,7 @@ func (s *DataStore) CreateUser(ctx context.Context, user data.User) ([]data.User
 
 	id := len(users) + 1
 	user.ID = id
+	user.OwnedFunds = []data.OwnedFund{}
 
 	users = append(users, user)
 

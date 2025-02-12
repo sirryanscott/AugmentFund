@@ -44,7 +44,7 @@ func main() {
 	r.Get("/cap-table/{id}", fundHandler.GetCapTableByID)
 
 	// Fund routes
-	r.Post("/fund", fundHandler.CreateFund)
+	r.Post("/funds", fundHandler.CreateFund)
 	r.Post("/transfer", fundHandler.CreateTransfer)
 	r.Get("/transfer/history/{id}", fundHandler.GetTransferHistoryForFund)
 

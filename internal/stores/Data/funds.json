@@ -1,47 +1,15 @@
 [
   {
     "id": 1,
-    "name": "Fund 1",
+    "name": "The New Fund",
     "totalShares": 1000,
-    "ownedShares": 700,
+    "ownedShares": 100,
     "owners": {
       "1": {
         "id": 1,
-        "name": "John Doe",
-        "totalShares": 200,
-        "dateAcquired": "2025-02-12 10:57:04"
-      },
-      "2": {
-        "id": 2,
-        "name": "Jane Doe",
-        "totalShares": 300,
-        "dateAcquired": "2025-02-12 10:55:39"
-      }
-    }
-  },
-  {
-    "id": 2,
-    "name": "An Awesome Fund",
-    "totalShares": 2000,
-    "ownedShares": 2000,
-    "owners": {
-      "1": {
-        "id": 1,
-        "name": "John Doe",
-        "totalShares": 1300,
-        "dateAcquired": "2025-02-11 23:12:20"
-      },
-      "2": {
-        "id": 2,
-        "name": "Jane Doe",
+        "name": "Bill Smith",
         "totalShares": 100,
-        "dateAcquired": "2025-02-11 22:24:31"
-      },
-      "3": {
-        "id": 3,
-        "name": "Ryan Struthers",
-        "totalShares": 600,
-        "dateAcquired": "2025-02-11 23:12:59"
+        "dateAcquired": "2025-02-12 11:47:57"
       }
     }
   }
